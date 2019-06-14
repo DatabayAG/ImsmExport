@@ -1,6 +1,6 @@
 # ImsmExport
 ILIAS Plugin for exporting results for single/multiple choice questions in IMS format 
-* For ILIAS versions: 5.4.0 - 5.4.999
+* For ILIAS versions: 5.2.0 - 5.4.999
 
 ## Installation Instructions
 1. Clone this repository 
