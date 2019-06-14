@@ -2,6 +2,7 @@
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once 'Modules/Test/classes/class.ilTestExportPlugin.php';
+require_once  'Modules/TestQuestionPool/classes/class.assQuestion.php';
 
 /**
  * Abstract parent class for all event hook plugin classes.
