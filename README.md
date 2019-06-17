@@ -27,7 +27,7 @@ It  does not contain personal data and can be further processed by the IMS-m sof
 
 
 ## ImsmExport  View
-![ImsmExport View](https://databayag.github.io/ImsmRxport/IMSm_export.png)
+![ImsmExport View](https://github.com/DatabayAG/databayag.github.io/blob/master/ImsmExport/IMSm_export.png)
 
 ## ImsmExport  File View
 ![ImsmExport File View](https://databayag.github.io/ImsmRxport/imsm_export_file.png)
