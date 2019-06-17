@@ -1,5 +1,18 @@
 # ImsmExport
 ILIAS Plugin for exporting results for single/multiple choice questions in IMS format 
+
+The Item Management System (IMS-m, www.ims-m.org) is an external platform for managing exam questions. 
+There, (mainly medical) questions can be managed, evaluated and shared.
+ 
+IMS-m has itself been extended to allow tests created in IMS-m to be exported as an ILIAS test object.  
+Currently single choice (SC) and multiple choice (MC) question types are  supported.
+ 
+Once the test has been completed, the test results should be returned to the IMS-M platform 
+so that statistics on the quality of the questions can be compiled. 
+A special result file in CSV format can be exported within the test from the admin area "Export". 
+It  does not contain personal data and can be further processed by the IMS-m software "Examinator".
+
+
 * For ILIAS versions: 5.2.0 - 5.4.999
 
 ## Installation Instructions
