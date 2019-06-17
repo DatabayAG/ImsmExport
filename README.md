@@ -12,8 +12,8 @@ so that statistics on the quality of the questions can be compiled.
 A special result file in CSV format can be exported within the test from the admin area "Export". 
 It  does not contain personal data and can be further processed by the IMS-m software "Examinator".
 
-
 * For ILIAS versions: 5.2.0 - 5.4.999
+
 
 ## Installation Instructions
 1. Clone this repository 
@@ -24,3 +24,10 @@ It  does not contain personal data and can be further processed by the IMS-m sof
 4. Select **Plugins** from the **Administration** main menu drop down.
 5. Search the **ImsmExport** plugin in the list of plugin and choose **Install** from the **Actions** drop down.
 6. Search the **ImsmExport** plugin in the list of plugin and choose **Activate** from the **Actions** drop down.
+
+
+## ImsmExport  View
+![ImsmExport View](https://databayag.github.io/ImsmRxport/IMSm_export.png)
+
+## ImsmExport  File View
+![ImsmExport File View](https://databayag.github.io/ImsmRxport/imsm_export_file.png)
