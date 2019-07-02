@@ -137,7 +137,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
 			$csv .= join($csvrow, $separator) . "\n";
 		}
 
-		ilUtil::makeDirParents(dirname($filename->getPathname('ims', 'ims')));
-		file_put_contents($filename->getPathname('ims', 'ims'), $csv);
+		ilUtil::makeDirParents(dirname($filename->getPathname('csv', 'csv')));
+		file_put_contents($filename->getPathname('csv', 'csv'), $csv);
 	}
 }
