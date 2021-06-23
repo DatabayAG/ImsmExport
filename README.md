@@ -1,7 +1,7 @@
 # ImsmExport
 ILIAS Plugin for exporting results for single/multiple choice questions in IMS format 
 
-The Item Management System (IMS-m, www.ims-m.org) is an external platform for managing exam questions. 
+The Item Management System (IMS-m, https://www.ucan-assess.org/) is an external platform for managing exam questions. 
 There, (mainly medical) questions can be managed, evaluated and shared.
  
 IMS-m has itself been extended to allow tests created in IMS-m to be exported as an ILIAS test object.  
