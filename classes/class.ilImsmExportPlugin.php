@@ -108,11 +108,10 @@ class ilImsmExportPlugin extends ilTestExportPlugin
                         } elseif ($type === self::K_PRIM) {
                             $answers = $this->getAnswersForKPrimChoiceQuestions($solutions);
                         } elseif ($type === self::LONG_MENU) {
-
+                            $answers = $this->getAnswersForLongMenuQuestions($solutions, count($objQuestion->getAnswers()));
                         } elseif ($type === self::NUMERIC) {
 
                         }
-                        sort($answers);
                         $pos = $positions[$question["id"]];
                         $a_csv_row[$col + $pos] = implode(",", $answers);
                     }
@@ -156,6 +155,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             $selected_answer = chr(65 + $solutions[$i]["value1"]);
             array_push($answers, $selected_answer);
         }
+        sort($answers);
         return $answers;
     }
 
@@ -176,6 +176,25 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         if (count($answers) < 4) {
             $answers = array_merge($answers, $must_exists);
         }
+        sort($answers);
+        return $answers;
+    }
+
+    protected function getAnswersForLongMenuQuestions(array $solutions, $answer_count): array
+    {
+        $answers = [];
+
+        for ($i = 0; $i < $answer_count; $i++) {
+            if(! isset($answers[$i])){
+                $answers[$i] = '';
+            }
+
+            if(isset($solutions[$i])) {
+                $pos = (int) $solutions[$i]["value1"];
+                $answers[$pos] = $solutions[$i]["value2"];
+                }
+            }
+
         return $answers;
     }
 
