@@ -12,6 +12,11 @@ require_once  'Modules/TestQuestionPool/classes/class.assQuestion.php';
  */
 class ilImsmExportPlugin extends ilTestExportPlugin
 {
+    const SINGLE_CHOICE = 'assSingleChoice';
+    const MULTIPLE_CHOICE = 'assMultipleChoice';
+    const K_PRIM = 'assKprimChoice';
+    const LONG_MENU = 'assLongMenu';
+    const NUMERIC = 'assNumeric';
 	/**
 	 * Get Plugin Name. Must be same as in class name il<Name>Plugin
 	 * and must correspond to plugins subdirectory name.
@@ -71,9 +76,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
 		{
 			$question = assQuestion::_instantiateQuestion($aid);
 
-			$is_sc = strcmp($question->getQuestionType(), 'assSingleChoice') == 0;
-			$is_mc = strcmp($question->getQuestionType(), 'assMultipleChoice') == 0;
-			if($is_sc || $is_mc)
+			if($this->isValidQuestionType($question->getQuestionType()))
 			{
 				$imsm_id = $question->getExternalId();
 				$a_csv_header_row[$col + $positions[$aid]] = $imsm_id;
@@ -101,21 +104,23 @@ class ilImsmExportPlugin extends ilTestExportPlugin
 				foreach($userdata->getQuestions($pass) as $question)
 				{
 					$objQuestion = assQuestion::_instantiateQuestion($question["id"]);
-						
-					$is_sc = strcmp($objQuestion->getQuestionType(), 'assSingleChoice') == 0;
-					$is_mc = strcmp($objQuestion->getQuestionType(), 'assMultipleChoice') == 0;
-					if(is_object($objQuestion) && ($is_sc || $is_mc))
+                    $type = $objQuestion->getQuestionType();
+					if(is_object($objQuestion) && $this->isValidQuestionType($objQuestion->getQuestionType()))
 					{
 						$solutions = $objQuestion->getSolutionValues($active_id, $pass);
-						$answers = array();
-						for($i = 0; $i < count($solutions); $i++)
-						{
-							$selectedanswer = chr(65 + $solutions[$i]["value1"]);
-							array_push($answers, $selectedanswer);
-						}
-						sort($answers);
-						$pos = $positions[$question["id"]];
-						$a_csv_row[$col + $pos] = implode($answers, ",");
+						$answers = [];
+                        if(in_array($type, [self::SINGLE_CHOICE, self::MULTIPLE_CHOICE])) {
+                            $answers = $this->getAnswersForSingleAndMultipleChoiceQuestions($solutions);
+                        } elseif ($type === self::K_PRIM) {
+
+                        } elseif ($type === self::LONG_MENU) {
+
+                        } elseif ($type === self::NUMERIC) {
+
+                        }
+                        sort($answers);
+                        $pos = $positions[$question["id"]];
+                        $a_csv_row[$col + $pos] = implode(",", $answers);
 					}
 				}
 			}
@@ -134,10 +139,30 @@ class ilImsmExportPlugin extends ilTestExportPlugin
 		foreach($a_csv_data_rows as $evalrow)
 		{
 			$csvrow = $this->getTest()->processCSVRow($evalrow, FALSE, $separator);
-			$csv .= join($csvrow, $separator) . "\n";
+			$csv .= join($separator, $csvrow) . "\n";
 		}
 
 		ilUtil::makeDirParents(dirname($filename->getPathname('csv', 'csv')));
 		file_put_contents($filename->getPathname('csv', 'csv'), $csv);
 	}
+
+    protected function getAnswersForSingleAndMultipleChoiceQuestions(array $solutions): array
+    {
+        $answers = [];
+        for ($i = 0; $i < count($solutions); $i++) {
+            $selected_answer = chr(65 + $solutions[$i]["value1"]);
+            array_push($answers, $selected_answer);
+        }
+        return $answers;
+    }
+
+    protected function isValidQuestionType(string $type) : bool {
+        $valid_types = [self::SINGLE_CHOICE, self::MULTIPLE_CHOICE, self::K_PRIM, self::LONG_MENU, self::NUMERIC];
+
+        if(in_array($type, $valid_types)){
+            return true;
+        }
+        return false;
+    }
+
 }
