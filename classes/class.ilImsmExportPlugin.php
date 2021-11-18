@@ -110,7 +110,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
                         } elseif ($type === self::LONG_MENU) {
                             $answers = $this->getAnswersForLongMenuQuestions($solutions, count($objQuestion->getAnswers()));
                         } elseif ($type === self::NUMERIC) {
-
+                            $answers = $this->getAnswersForNumericQuestions($solutions);
                         }
                         $pos = $positions[$question["id"]];
                         $a_csv_row[$col + $pos] = implode(",", $answers);
@@ -180,12 +180,24 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         return $answers;
     }
 
+    protected function getAnswersForNumericQuestions(array $solutions): array
+    {
+        $answers = [];
+
+        for ($i = 0; $i < count($solutions); $i++) {
+            $selected_answer = $solutions[$i]["value1"];
+            array_push($answers, $selected_answer);
+        }
+
+        return $answers;
+    }
+
     protected function getAnswersForLongMenuQuestions(array $solutions, $answer_count): array
     {
         $answers = [];
 
         for ($i = 0; $i < $answer_count; $i++) {
-            if(! isset($answers[$i])){
+            if( ! isset($answers[$i])){
                 $answers[$i] = '';
             }
 
