@@ -48,6 +48,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
 
     /**
      * @param ilTestExportFilename $filename
+     * @throws ilException
      */
     protected function buildExportFile(ilTestExportFilename $filename)
     {
@@ -75,7 +76,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         foreach ($titles as $aid => $title) {
             $question = assQuestion::_instantiateQuestion($aid);
 
-            if ($this->isValidQuestionType($question->getQuestionType())) {
+            if ($this->isQuestionTypeValid($question->getQuestionType())) {
                 $imsm_id = $question->getExternalId();
                 $a_csv_header_row[$col + $positions[$aid]] = $imsm_id;
             }
@@ -100,7 +101,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
                 foreach ($userdata->getQuestions($pass) as $question) {
                     $objQuestion = assQuestion::_instantiateQuestion($question["id"]);
                     $type = $objQuestion->getQuestionType();
-                    if (is_object($objQuestion) && $this->isValidQuestionType($objQuestion->getQuestionType())) {
+                    if (is_object($objQuestion) && $this->isQuestionTypeValid($objQuestion->getQuestionType())) {
                         $solutions = $objQuestion->getSolutionValues($active_id, $pass);
                         $answers = [];
                         if (in_array($type, [self::SINGLE_CHOICE, self::MULTIPLE_CHOICE])) {
@@ -138,7 +139,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         file_put_contents($filename->getPathname('csv', 'csv'), $csv);
     }
 
-    protected function isValidQuestionType(string $type): bool
+    protected function isQuestionTypeValid(string $type): bool
     {
         $valid_types = [self::SINGLE_CHOICE, self::MULTIPLE_CHOICE, self::K_PRIM, self::LONG_MENU, self::NUMERIC];
 
@@ -185,8 +186,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $answers = [];
 
         for ($i = 0; $i < count($solutions); $i++) {
-            $selected_answer = $solutions[$i]["value1"];
-            array_push($answers, $selected_answer);
+            $answers[$i] = $solutions[$i]["value1"];
         }
 
         return $answers;
