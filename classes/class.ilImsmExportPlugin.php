@@ -47,10 +47,10 @@ class ilImsmExportPlugin extends ilTestExportPlugin
     }
 
     /**
-     * @param ilTestExportFilename $filename
+     * @param ilTestExportFilename $export_path
      * @throws ilException
      */
-    protected function buildExportFile(ilTestExportFilename $filename)
+    protected function buildExportFile(ilTestExportFilename $export_path)
     {
         $data = $this->getTest()->getCompleteEvaluationData(TRUE);
         $titles = $this->getTest()->getQuestionTitlesAndIndexes();
@@ -135,8 +135,8 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             $csv .= join($separator, $csvrow) . "\n";
         }
 
-        ilUtil::makeDirParents(dirname($filename->getPathname('csv', 'csv')));
-        file_put_contents($filename->getPathname('csv', 'csv'), $csv);
+        ilUtil::makeDirParents(dirname($export_path->getPathname('csv', 'csv')));
+        file_put_contents($export_path->getPathname('csv', 'csv'), $csv);
     }
 
     protected function isQuestionTypeValid(string $type): bool
