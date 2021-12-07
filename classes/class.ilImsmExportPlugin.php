@@ -61,8 +61,12 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $pos = 0;
         $row = 0;
         foreach ($orderedIds as $oid) {
-            $positions[$oid] = $pos;
-            $pos++;
+            $question = assQuestion::_instantiateQuestion($oid);
+
+            if ($this->isQuestionTypeValid($question->getQuestionType())) {
+                $positions[$oid] = $pos;
+                $pos++;
+            } 
         }
 
         // fill csv header
@@ -114,7 +118,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
                             $answers = $this->getAnswersForNumericQuestions($solutions);
                         }
                         $pos = $positions[$question["id"]];
-                        $a_csv_row[$col + $pos] = implode(",", $answers);
+                        $a_csv_row[$col + $pos] = '"' . implode(",", $answers) . '"';
                     }
                 }
             }
