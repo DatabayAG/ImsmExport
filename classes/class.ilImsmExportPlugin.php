@@ -66,26 +66,26 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             if ($this->isQuestionTypeValid($question->getQuestionType())) {
                 $positions[$oid] = $pos;
                 $pos++;
-            } 
+            }
         }
 
         // fill csv header
         $a_csv_header_row = array();
         $col = 0;
-        $a_csv_header_row[$col++] = 'last_name';
-        $a_csv_header_row[$col++] = 'first_name';
-        $a_csv_header_row[$col++] = 'Matrikel';
-        $a_csv_header_row[$col++] = 'user';
+        $a_csv_header_row[$col++] = $this->addEnclosure('last_name');
+        $a_csv_header_row[$col++] = $this->addEnclosure('first_name');
+        $a_csv_header_row[$col++] = $this->addEnclosure('Matrikel');
+        $a_csv_header_row[$col++] = $this->addEnclosure('user');
 
         foreach ($titles as $aid => $title) {
             $question = assQuestion::_instantiateQuestion($aid);
 
             if ($this->isQuestionTypeValid($question->getQuestionType())) {
                 $imsm_id = $question->getExternalId();
-                $a_csv_header_row[$col + $positions[$aid]] = $imsm_id;
+                $a_csv_header_row[$col + $positions[$aid]] = $this->addEnclosure($imsm_id);
             }
         }
-        $a_csv_header_row[count($a_csv_header_row)] = 'time';
+        $a_csv_header_row[count($a_csv_header_row)] = $this->addEnclosure('time');
 
         // fill csv body
         $a_csv_data_rows = array();
@@ -95,10 +95,10 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             $a_csv_row = array();
             $col = 0;
             $anon_id = $row;
-            $a_csv_row[$col++] = "lastname_" . $anon_id;
-            $a_csv_row[$col++] = "firstname_" . $anon_id;
-            $a_csv_row[$col++] = "1111" . $anon_id;
-            $a_csv_row[$col++] = "id_" . $anon_id;
+            $a_csv_row[$col++] = $this->addEnclosure("lastname_" . $anon_id);
+            $a_csv_row[$col++] = $this->addEnclosure("firstname_" . $anon_id);
+            $a_csv_row[$col++] = $this->addEnclosure("1111" . $anon_id);
+            $a_csv_row[$col++] = $this->addEnclosure("id_" . $anon_id);
 
             $pass = $userdata->getScoredPass();
             if (is_object($userdata) && is_array($userdata->getQuestions($pass))) {
@@ -207,11 +207,15 @@ class ilImsmExportPlugin extends ilTestExportPlugin
 
             if(isset($solutions[$i])) {
                 $pos = (int) $solutions[$i]["value1"];
-                $answers[$pos] = $solutions[$i]["value2"];
+                $answers[$pos] = $this->addEnclosure($this->addEnclosure($solutions[$i]["value2"]));
                 }
             }
 
         return $answers;
+    }
+
+    protected function addEnclosure(string $string) : string{
+        return '"' . $string . '"';
     }
 
 }
