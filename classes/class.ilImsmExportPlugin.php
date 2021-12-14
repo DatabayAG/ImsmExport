@@ -135,7 +135,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $csv = "";
         $separator = ";";
         foreach ($a_csv_data_rows as $evalrow) {
-            $csvrow = $this->processCSVRow($evalrow, false, $separator);
+            $csvrow = $this->processCSVRow($evalrow);
             $csv .= join($separator, $csvrow) . "\n";
         }
 
