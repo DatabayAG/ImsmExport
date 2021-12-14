@@ -135,7 +135,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $csv = "";
         $separator = ";";
         foreach ($a_csv_data_rows as $evalrow) {
-            $csvrow = $this->getTest()->processCSVRow($evalrow, FALSE, $separator);
+            $csvrow = $this->processCSVRow($evalrow, false, $separator);
             $csv .= join($separator, $csvrow) . "\n";
         }
 
@@ -151,6 +151,11 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             return true;
         }
         return false;
+    }
+
+    protected function addEnclosure(string $string): string
+    {
+        return '"' . $string . '"';
     }
 
     protected function getAnswersForSingleAndMultipleChoiceQuestions(array $solutions): array
@@ -185,6 +190,30 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         return $answers;
     }
 
+    protected function getAnswersForLongMenuQuestions(array $solutions, $answer_count): array
+    {
+        $answers = [];
+        $empty_count = 0;
+        for ($i = 0; $i < $answer_count; $i++) {
+            if (!isset($answers[$i])) {
+                $answers[$i] = '';
+            }
+
+            if (isset($solutions[$i])) {
+                $pos = (int)$solutions[$i]["value1"];
+                $answers[$pos] = $this->addEnclosure($this->addEnclosure($solutions[$i]["value2"]));
+            } else {
+                $empty_count++;
+            }
+        }
+
+        if ($empty_count === $answer_count) {
+            $answers = [];
+        }
+
+        return $answers;
+    }
+
     protected function getAnswersForNumericQuestions(array $solutions): array
     {
         $answers = [];
@@ -196,26 +225,15 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         return $answers;
     }
 
-    protected function getAnswersForLongMenuQuestions(array $solutions, $answer_count): array
+    public function &processCSVRow($row) : array
     {
-        $answers = [];
+        $result = array();
+        foreach ($row as $rowindex => $entry) {
+            $entry = str_replace(chr(13) . chr(10), chr(10), $entry);
 
-        for ($i = 0; $i < $answer_count; $i++) {
-            if( ! isset($answers[$i])){
-                $answers[$i] = '';
-            }
-
-            if(isset($solutions[$i])) {
-                $pos = (int) $solutions[$i]["value1"];
-                $answers[$pos] = $this->addEnclosure($this->addEnclosure($solutions[$i]["value2"]));
-                }
-            }
-
-        return $answers;
-    }
-
-    protected function addEnclosure(string $string) : string{
-        return '"' . $string . '"';
+            $result[$rowindex] = $entry;
+        }
+        return $result;
     }
 
 }
