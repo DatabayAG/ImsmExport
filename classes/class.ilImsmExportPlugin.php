@@ -172,6 +172,9 @@ class ilImsmExportPlugin extends ilTestExportPlugin
     protected function getAnswersForKPrimChoiceQuestions(array $solutions): array
     {
         $answers = [];
+        if(sizeof($solutions) === 0 ) {
+            return $answers;
+        }
         $must_exists = ['A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D'];
         for ($i = 0; $i < count($solutions); $i++) {
             $selected_answer = chr(65 + $solutions[$i]["value1"]);
