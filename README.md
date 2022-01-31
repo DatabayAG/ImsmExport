@@ -5,14 +5,21 @@ The Item Management System (IMS-m, https://www.ucan-assess.org/) is an external 
 There, (mainly medical) questions can be managed, evaluated and shared.
  
 IMS-m has itself been extended to allow tests created in IMS-m to be exported as an ILIAS test object.  
-Currently single choice (SC) and multiple choice (MC) question types are  supported.
+Currently the following question types are  supported:
+
+* Typ A
+* Pick-N
+* Intervall
+* Long Menu
+* Typ KPrim
+
  
 Once the test has been completed, the test results should be returned to the IMS-M platform 
 so that statistics on the quality of the questions can be compiled. 
 A special result file in CSV format can be exported within the test from the admin area "Export". 
 It  does not contain personal data and can be further processed by the IMS-m software "Examinator".
 
-* For ILIAS versions: 5.2.0 - 5.4.999
+* For ILIAS versions: 5.2.0 - 7.9.99
 
 
 ## Installation Instructions
