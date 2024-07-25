@@ -1,1 +1,6 @@
 imsm_format#:#IMSm Ergebnisformat (CSV)
+privacy#:#Datenschutz
+privacy_info#:#Legen Sie hier fest, welche personenbezogenen Daten eines ILIAS-Benutzerkontos an Stelle eines Pseudonyms in die Ausgabedatei geschrieben werden.
+use_fullname#:#Vor- und Nachname
+use_login#:#ILIAS-Benutzername
+use_matriculation#:#Matrikelnummer

@@ -1,9 +1,6 @@
 <?php
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-require_once 'Modules/Test/classes/class.ilTestExportPlugin.php';
-require_once 'Modules/TestQuestionPool/classes/class.assQuestion.php';
-
 /**
  * Abstract parent class for all event hook plugin classes.
  * @author Michael Jansen <mjansen@databay.de>
@@ -25,9 +22,14 @@ class ilImsmExportPlugin extends ilTestExportPlugin
      * (and should be made final)
      * @return string Plugin Name
      */
-    function getPluginName()
+    public function getPluginName()
     {
         return 'ImsmExport';
+    }
+
+    public function getConfig() : ilImsmExportConfig
+    {
+        return new ilImsmExportConfig(new ilSetting('plugin.texpimsm'));
     }
 
     /**
@@ -52,7 +54,8 @@ class ilImsmExportPlugin extends ilTestExportPlugin
      */
     protected function buildExportFile(ilTestExportFilename $export_path)
     {
-        $data = $this->getTest()->getCompleteEvaluationData(TRUE);
+        $config = $this->getConfig();
+        $data = $this->getTest()->getCompleteEvaluationData(true);
         $titles = $this->getTest()->getQuestionTitlesAndIndexes();
         $orderedIds = $this->getTest()->getQuestions();
         asort($orderedIds);
@@ -92,13 +95,15 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $a_csv_data_rows[$row++] = $a_csv_header_row;
 
         foreach ($data->getParticipants() as $active_id => $userdata) {
+            $user = new ilObjUser($userdata->getUserID());
+
             $a_csv_row = array();
             $col = 0;
             $anon_id = $row;
-            $a_csv_row[$col++] = $this->addEnclosure("lastname_" . $anon_id);
-            $a_csv_row[$col++] = $this->addEnclosure("firstname_" . $anon_id);
-            $a_csv_row[$col++] = $this->addEnclosure("1111" . $anon_id);
-            $a_csv_row[$col++] = $this->addEnclosure("id_" . $anon_id);
+            $a_csv_row[$col++] = $this->addEnclosure($config->getUseFullname() ? $user->getLastname() : "lastname_" . $anon_id);
+            $a_csv_row[$col++] = $this->addEnclosure($config->getUseFullname() ? $user->getFirstname() : "firstname_" . $anon_id);
+            $a_csv_row[$col++] = $this->addEnclosure($config->getUseMatriculation() ? $user->getMatriculation() : "1111" . $anon_id);
+            $a_csv_row[$col++] = $this->addEnclosure($config->getUseLogin() ? $user->getLogin() : "id_" . $anon_id);
 
             $pass = $userdata->getScoredPass();
             if (is_object($userdata) && is_array($userdata->getQuestions($pass))) {
@@ -139,11 +144,17 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             $csv .= join($separator, $csvrow) . "\n";
         }
 
-        ilUtil::makeDirParents(dirname($export_path->getPathname('csv', 'csv')));
-        file_put_contents($export_path->getPathname('csv', 'csv'), $csv);
+        // use ilFileUtils::getASCIIFilename from ILIAS 8 on
+        $additional = ilUtil::getASCIIFilename($this->getTest()->getImportId());
+        if (empty($additional)) {
+            $additional = 'csv';
+        }
+
+        ilUtil::makeDirParents(dirname($export_path->getPathname('csv', $additional)));
+        file_put_contents($export_path->getPathname('csv', $additional), $csv);
     }
 
-    protected function isQuestionTypeValid(string $type): bool
+    protected function isQuestionTypeValid(string $type) : bool
     {
         $valid_types = [self::SINGLE_CHOICE, self::MULTIPLE_CHOICE, self::K_PRIM, self::LONG_MENU, self::NUMERIC];
 
@@ -153,12 +164,12 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         return false;
     }
 
-    protected function addEnclosure(string $string): string
+    protected function addEnclosure(string $string) : string
     {
         return '"' . $string . '"';
     }
 
-    protected function getAnswersForSingleAndMultipleChoiceQuestions(array $solutions): array
+    protected function getAnswersForSingleAndMultipleChoiceQuestions(array $solutions) : array
     {
         $answers = [];
         for ($i = 0; $i < count($solutions); $i++) {
@@ -169,10 +180,10 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         return $answers;
     }
 
-    protected function getAnswersForKPrimChoiceQuestions(array $solutions): array
+    protected function getAnswersForKPrimChoiceQuestions(array $solutions) : array
     {
         $answers = [];
-        if(sizeof($solutions) === 0 ) {
+        if (sizeof($solutions) === 0) {
             return $answers;
         }
         $must_exists = ['A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D'];
@@ -193,7 +204,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         return $answers;
     }
 
-    protected function getAnswersForLongMenuQuestions(array $solutions, $answer_count): array
+    protected function getAnswersForLongMenuQuestions(array $solutions, $answer_count) : array
     {
         $answers = [];
         $empty_count = 0;
@@ -203,7 +214,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             }
 
             if (isset($solutions[$i])) {
-                $pos = (int)$solutions[$i]["value1"];
+                $pos = (int) $solutions[$i]["value1"];
                 $answers[$pos] = $this->addEnclosure($this->addEnclosure($solutions[$i]["value2"]));
             } else {
                 $empty_count++;
@@ -217,7 +228,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         return $answers;
     }
 
-    protected function getAnswersForNumericQuestions(array $solutions): array
+    protected function getAnswersForNumericQuestions(array $solutions) : array
     {
         $answers = [];
 
@@ -238,5 +249,4 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         }
         return $result;
     }
-
 }
