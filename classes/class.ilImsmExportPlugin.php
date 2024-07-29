@@ -52,7 +52,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
      * @param ilTestExportFilename $export_path
      * @throws ilException
      */
-    protected function buildExportFile(ilTestExportFilename $export_path)
+    protected function buildExportFile(ilTestExportFilename $export_path): void
     {
         $config = $this->getConfig();
         $data = $this->getTest()->getCompleteEvaluationData(true);
@@ -64,7 +64,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $pos = 0;
         $row = 0;
         foreach ($orderedIds as $oid) {
-            $question = assQuestion::_instantiateQuestion($oid);
+            $question = assQuestion::instantiateQuestion($oid);
 
             if ($this->isQuestionTypeValid($question->getQuestionType())) {
                 $positions[$oid] = $pos;
@@ -81,7 +81,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $header_row[$col++] = 'user';
 
         foreach ($titles as $aid => $title) {
-            $question = assQuestion::_instantiateQuestion($aid);
+            $question = assQuestion::instantiateQuestion($aid);
 
             if ($this->isQuestionTypeValid($question->getQuestionType())) {
                 $imsm_id = $question->getExternalId();
@@ -108,7 +108,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             $pass = $userdata->getScoredPass();
             if (is_object($userdata) && is_array($userdata->getQuestions($pass))) {
                 foreach ($userdata->getQuestions($pass) as $question) {
-                    $objQuestion = assQuestion::_instantiateQuestion($question["id"]);
+                    $objQuestion = assQuestion::instantiateQuestion($question["id"]);
                     $type = $objQuestion->getQuestionType();
                     if (is_object($objQuestion) && $this->isQuestionTypeValid($objQuestion->getQuestionType())) {
                         $solutions = $objQuestion->getSolutionValues($active_id, $pass);

@@ -1,7 +1,7 @@
 <?php
 $id                = 'texpimsm';
-$version           = '3.0.0';
-$ilias_min_version = '8.13';
-$ilias_max_version = '8.999';
+$version           = '4.0.0';
+$ilias_min_version = '9.2';
+$ilias_max_version = '9.999';
 $responsible       = 'Michael Jansen';
 $responsible_mail  = 'mjansen@databay.de';
