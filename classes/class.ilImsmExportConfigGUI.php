@@ -3,7 +3,11 @@
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
 use Psr\Http\Message\ServerRequestInterface;
+use ILIAS\Filesystem\Filesystem;
 
+/**
+ * @ilCtrl_IsCalledBy ilImsmExportConfigGUI: ilObjComponentSettingsGUI
+ */
 class ilImsmExportConfigGUI extends ilPluginConfigGUI
 {
     private ilImsmExportPlugin $plugin;
@@ -16,11 +20,10 @@ class ilImsmExportConfigGUI extends ilPluginConfigGUI
     private Renderer $renderer;
     private ServerRequestInterface $request;
 
-
     /**
      * Handles all commands, default is "configure"
      */
-    public function performCommand($cmd)
+    public function performCommand(string $cmd) : void
     {
         global $DIC;
 
