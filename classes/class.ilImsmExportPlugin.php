@@ -1,11 +1,11 @@
 <?php
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+use ILIAS\Filesystem\Filesystem;
+use ILIAS\Filesystem\Util\LegacyPathHelper;
+
 /**
- * Abstract parent class for all event hook plugin classes.
  * @author Michael Jansen <mjansen@databay.de>
- * @version $Id$
- * @ingroup ModulesTest
  */
 class ilImsmExportPlugin extends ilTestExportPlugin
 {
@@ -22,7 +22,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
      * (and should be made final)
      * @return string Plugin Name
      */
-    public function getPluginName()
+    public function getPluginName() : string
     {
         return 'ImsmExport';
     }
@@ -35,7 +35,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
     /**
      * @return string
      */
-    public function getFormatLabel()
+    public function getFormatLabel() : string
     {
         return $this->txt('imsm_format');
     }
@@ -43,7 +43,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
     /**
      * @return string
      */
-    protected function getFormatIdentifier()
+    protected function getFormatIdentifier() : string
     {
         return 'imsm';
     }
@@ -60,7 +60,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $orderedIds = $this->getTest()->getQuestions();
         asort($orderedIds);
 
-        $positions = array();
+        $positions = [];
         $pos = 0;
         $row = 0;
         foreach ($orderedIds as $oid) {
@@ -73,37 +73,37 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         }
 
         // fill csv header
-        $a_csv_header_row = array();
+        $header_row = [];
         $col = 0;
-        $a_csv_header_row[$col++] = $this->addEnclosure('last_name');
-        $a_csv_header_row[$col++] = $this->addEnclosure('first_name');
-        $a_csv_header_row[$col++] = $this->addEnclosure('Matrikel');
-        $a_csv_header_row[$col++] = $this->addEnclosure('user');
+        $header_row[$col++] = 'last_name';
+        $header_row[$col++] = 'first_name';
+        $header_row[$col++] = 'Matrikel';
+        $header_row[$col++] = 'user';
 
         foreach ($titles as $aid => $title) {
             $question = assQuestion::_instantiateQuestion($aid);
 
             if ($this->isQuestionTypeValid($question->getQuestionType())) {
                 $imsm_id = $question->getExternalId();
-                $a_csv_header_row[$col + $positions[$aid]] = $this->addEnclosure($imsm_id);
+                $header_row[$col + $positions[$aid]] = $imsm_id;
             }
         }
-        $a_csv_header_row[count($a_csv_header_row)] = $this->addEnclosure('time');
+        $header_row[count($header_row)] = 'time';
 
         // fill csv body
-        $a_csv_data_rows = array();
-        $a_csv_data_rows[$row++] = $a_csv_header_row;
+        $all_rows = [];
+        $all_rows[$row++] = $header_row;
 
         foreach ($data->getParticipants() as $active_id => $userdata) {
             $user = new ilObjUser($userdata->getUserID());
 
-            $a_csv_row = array();
+            $data_row = [];
             $col = 0;
             $anon_id = $row;
-            $a_csv_row[$col++] = $this->addEnclosure($config->getUseFullname() ? $user->getLastname() : "lastname_" . $anon_id);
-            $a_csv_row[$col++] = $this->addEnclosure($config->getUseFullname() ? $user->getFirstname() : "firstname_" . $anon_id);
-            $a_csv_row[$col++] = $this->addEnclosure($config->getUseMatriculation() ? $user->getMatriculation() : "1111" . $anon_id);
-            $a_csv_row[$col++] = $this->addEnclosure($config->getUseLogin() ? $user->getLogin() : "id_" . $anon_id);
+            $data_row[$col++] = $config->getUseFullname() ? $user->getLastname() : "lastname_" . $anon_id;
+            $data_row[$col++] = $config->getUseFullname() ? $user->getFirstname() : "firstname_" . $anon_id;
+            $data_row[$col++] = $config->getUseMatriculation() ? $user->getMatriculation() : "1111" . $anon_id;
+            $data_row[$col++] = $config->getUseLogin() ? $user->getLogin() : "id_" . $anon_id;
 
             $pass = $userdata->getScoredPass();
             if (is_object($userdata) && is_array($userdata->getQuestions($pass))) {
@@ -118,12 +118,13 @@ class ilImsmExportPlugin extends ilTestExportPlugin
                         } elseif ($type === self::K_PRIM) {
                             $answers = $this->getAnswersForKPrimChoiceQuestions($solutions);
                         } elseif ($type === self::LONG_MENU) {
-                            $answers = $this->getAnswersForLongMenuQuestions($solutions, count($objQuestion->getAnswers()));
+                            $answers = $this->getAnswersForLongMenuQuestions($solutions,
+                                count($objQuestion->getAnswers()));
                         } elseif ($type === self::NUMERIC) {
                             $answers = $this->getAnswersForNumericQuestions($solutions);
                         }
                         $pos = $positions[$question["id"]];
-                        $a_csv_row[$col + $pos] = '"' . implode(",", $answers) . '"';
+                        $data_row[$col + $pos] = implode(",", $answers);
                     }
                 }
             }
@@ -131,27 +132,35 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             $lv = getdate($data->getParticipant($active_id)->getLastVisit());
             $tstamp = mktime($lv['hours'], $lv['minutes'], $lv['seconds'], $lv['mon'], $lv['mday'], $lv['year']);
             $lastvisit = date("d.m.Y G:i:s", $tstamp);
-            $a_csv_row[count($a_csv_row)] = $lastvisit;
-            ksort($a_csv_row);
-            $a_csv_data_rows[$row] = $a_csv_row;
+            $data_row[count($data_row)] = $lastvisit;
+            ksort($data_row);
+            $all_rows[$row] = $data_row;
             $row++;
         }
 
-        $csv = "";
-        $separator = ";";
-        foreach ($a_csv_data_rows as $evalrow) {
-            $csvrow = $this->processCSVRow($evalrow);
-            $csv .= join($separator, $csvrow) . "\n";
+        $writer = new ilCSVWriter();
+        $writer->setDelimiter('"');
+        $writer->setSeparator(';');
+
+        foreach ($all_rows as $row) {
+            foreach ($row as $column) {
+                $writer->addColumn($column);
+            }
+            $writer->addRow();
         }
 
-        // use ilFileUtils::getASCIIFilename from ILIAS 8 on
-        $additional = ilUtil::getASCIIFilename($this->getTest()->getImportId());
+        $additional = ilFileUtils::getASCIIFilename($this->getTest()->getImportId());
         if (empty($additional)) {
             $additional = 'csv';
         }
 
-        ilUtil::makeDirParents(dirname($export_path->getPathname('csv', $additional)));
-        file_put_contents($export_path->getPathname('csv', $additional), $csv);
+        $absolute_path = $export_path->getPathname('csv', $additional);
+        $relative_path = LegacyPathHelper::createRelativePath($absolute_path);
+        $filesystem = LegacyPathHelper::deriveFilesystemFrom($absolute_path);
+        if (!$filesystem->hasDir(dirname($relative_path))) {
+            $filesystem->createDir(dirname($relative_path));
+        }
+        $filesystem->write($relative_path, $writer->getCSVString());
     }
 
     protected function isQuestionTypeValid(string $type) : bool
@@ -162,11 +171,6 @@ class ilImsmExportPlugin extends ilTestExportPlugin
             return true;
         }
         return false;
-    }
-
-    protected function addEnclosure(string $string) : string
-    {
-        return '"' . $string . '"';
     }
 
     protected function getAnswersForSingleAndMultipleChoiceQuestions(array $solutions) : array
@@ -215,7 +219,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
 
             if (isset($solutions[$i])) {
                 $pos = (int) $solutions[$i]["value1"];
-                $answers[$pos] = $this->addEnclosure($this->addEnclosure($solutions[$i]["value2"]));
+                $answers[$pos] = '"' . $solutions[$i]["value2"] . '"';
             } else {
                 $empty_count++;
             }
@@ -237,16 +241,5 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         }
 
         return $answers;
-    }
-
-    public function &processCSVRow($row) : array
-    {
-        $result = array();
-        foreach ($row as $rowindex => $entry) {
-            $entry = str_replace(chr(13) . chr(10), chr(10), $entry);
-
-            $result[$rowindex] = $entry;
-        }
-        return $result;
     }
 }
