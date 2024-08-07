@@ -13,7 +13,7 @@ Currently the following question types are  supported:
 * Long Menu
 * Typ KPrim
 
-Once the test has been completed, the test results should be returned to the IMS-M platform  so that statistics on the quality of the questions can be compiled.  A special result file in CSV format can be exported within the test "Export" tab. The assessment identifier from the IMS-M platform is integrated into the CSV file name, simplifying data managment and transfer. The resulting file can then be further processed by the IMS-M software "Examinator".
+Once the test has been completed, the test results should be returned to the IMS-M platform so that statistics on the quality of the questions can be compiled. A special result file in CSV format can be exported within the test "Export" tab. The assessment identifier from the IMS-M platform is integrated into the CSV file name, simplifying data managment and transfer. The resulting file can then be further processed by the IMS-M software "Examinator".
 
 By default, the export does not contain personal data. A configuration page in the plugin administration of ILIAS allows the ILIAS-administrators to use checkboxes to specify which personal data from an ILIAS user account should be included in the export. 
 
