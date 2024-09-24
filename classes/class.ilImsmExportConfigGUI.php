@@ -6,15 +6,29 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class ilImsmExportConfigGUI extends ilPluginConfigGUI
 {
-    private ilImsmExportPlugin $plugin;
-    private ilImsmExportConfig $config;
-    private ilLanguage $lng;
-    private ilCtrl $ctrl;
+    /** @var ilImsmExportPlugin  */
+    private $plugin;
+
+    /** @var ilImsmExportConfig  */
+    private $config;
+
+    /** @var ilLanguage  */
+    private $lng;
+
+    /** @var ilCtrl  */
+    private $ctrl;
+
     /** @var ilGlobalTemplateInterface $tpl */
     private $tpl;
-    private Factory $factory;
-    private Renderer $renderer;
-    private ServerRequestInterface $request;
+
+    /** @var Factory  */
+    private $factory;
+
+    /** @var Renderer  */
+    private $renderer;
+
+    /** @var ServerRequestInterface  */
+    private $request;
 
 
     /**
