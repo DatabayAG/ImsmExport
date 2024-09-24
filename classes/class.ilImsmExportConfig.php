@@ -2,7 +2,8 @@
 
 class ilImsmExportConfig
 {
-    private ilSetting $settings;
+    /** @var ilSetting  */
+    private $settings;
 
     public function __construct(ilSetting $settings)
     {
