@@ -1,6 +1,8 @@
 <?php
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+require_once(__DIR__ . '/class.ilImsmExportHelper.php');
+
 /**
  * Abstract parent class for all event hook plugin classes.
  * @author Michael Jansen <mjansen@databay.de>
@@ -14,6 +16,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
     const K_PRIM = 'assKprimChoice';
     const LONG_MENU = 'assLongMenu';
     const NUMERIC = 'assNumeric';
+    const TEXT_QUESTION = 'assTextQuestion';
 
     /**
      * Get Plugin Name. Must be same as in class name il<Name>Plugin
@@ -121,6 +124,8 @@ class ilImsmExportPlugin extends ilTestExportPlugin
                             $answers = $this->getAnswersForLongMenuQuestions($solutions, count($objQuestion->getAnswers()));
                         } elseif ($type === self::NUMERIC) {
                             $answers = $this->getAnswersForNumericQuestions($solutions);
+                        } elseif ($type === self::TEXT_QUESTION) {
+                            $answers = $this->getAnswersForTextQuestions($solutions, $active_id, $pass, $question["id"]);
                         }
                         $pos = $positions[$question["id"]];
                         $a_csv_row[$col + $pos] = '"' . implode(",", $answers) . '"';
@@ -156,7 +161,14 @@ class ilImsmExportPlugin extends ilTestExportPlugin
 
     protected function isQuestionTypeValid(string $type) : bool
     {
-        $valid_types = [self::SINGLE_CHOICE, self::MULTIPLE_CHOICE, self::K_PRIM, self::LONG_MENU, self::NUMERIC];
+        $valid_types = [
+            self::SINGLE_CHOICE, 
+            self::MULTIPLE_CHOICE, 
+            self::K_PRIM, 
+            self::LONG_MENU, 
+            self::NUMERIC,
+            self::TEXT_QUESTION
+        ];
 
         if (in_array($type, $valid_types)) {
             return true;
@@ -215,7 +227,10 @@ class ilImsmExportPlugin extends ilTestExportPlugin
 
             if (isset($solutions[$i])) {
                 $pos = (int) $solutions[$i]["value1"];
-                $answers[$pos] = $this->addEnclosure($this->addEnclosure($solutions[$i]["value2"]));
+                // Sanitize user input before adding to CSV
+                $sanitizedValue = ilImsmExportHelper::sanitizeFreetextForCsv($solutions[$i]["value2"]);
+                // Kein addEnclosure hier - wird in buildExportFile gemacht
+                $answers[$pos] = $sanitizedValue;
             } else {
                 $empty_count++;
             }
@@ -233,9 +248,51 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $answers = [];
 
         for ($i = 0; $i < count($solutions); $i++) {
-            $answers[$i] = $solutions[$i]["value1"];
+            $answers[$i] = ilImsmExportHelper::sanitizeFreetextForCsv($solutions[$i]["value1"]);
         }
 
+        return $answers;
+    }
+
+    protected function getAnswersForTextQuestions(array $solutions, $active_id, $pass, $question_id) : array
+    {
+        $answers = [];
+
+        for ($i = 0; $i < count($solutions); $i++) {
+            if (isset($solutions[$i]["value1"]) && $solutions[$i]["value1"] !== '') {
+                // Freitext-Eingabe sanitizen
+                $sanitizedText = ilImsmExportHelper::sanitizeFreetextForCsv($solutions[$i]["value1"]);
+                $answers[] = $sanitizedText;
+            }
+        }
+
+        // Falls keine Antwort gegeben wurde
+        if (empty($answers)) {
+            $answers = [''];
+        }
+        
+        // Prüfen ob manuelle Bewertung stattgefunden hat
+        global $DIC;
+        $db = $DIC->database();
+        
+        $query = "SELECT points, manual 
+                  FROM tst_test_result 
+                  WHERE active_fi = " . $db->quote($active_id, 'integer') . "
+                  AND question_fi = " . $db->quote($question_id, 'integer') . "
+                  AND pass = " . $db->quote($pass, 'integer');
+        
+        $result = $db->query($query);
+        
+        if ($row = $db->fetchAssoc($result)) {
+            if ($row['manual'] == 1) {
+                // Manuelle Bewertung erfolgt
+                // Single quotes (') statt double quotes (") verwenden, um CSV-Escaping-Probleme zu vermeiden,
+                // da " bereits als CSV-Steuerzeichen verwendet wird
+                $textPart = implode(' ', $answers);
+                $answers = ["'" . $textPart . "'", $row['points']];
+            }
+        }
+        
         return $answers;
     }
 
