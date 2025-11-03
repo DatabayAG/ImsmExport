@@ -27,7 +27,7 @@ class ilImsmExportHelper
         // 0.6 HTML-Entities dekodieren
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         
-        // 1. Non-breaking Spaces und andere Sonder-Whitespace normalisieren
+        // 1. Non-breaking Spaces und andere Whitespace characters normalisieren
         // Häufiges Problem bei Copy-Paste aus Word/PDF
         $text = preg_replace('/[\x{00A0}\x{1680}\x{2000}-\x{200A}\x{202F}\x{205F}\x{3000}]/u', ' ', $text);
         
