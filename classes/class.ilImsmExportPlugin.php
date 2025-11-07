@@ -156,7 +156,10 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         }
 
         ilUtil::makeDirParents(dirname($export_path->getPathname('csv', $additional)));
-        file_put_contents($export_path->getPathname('csv', $additional), $csv);
+        
+        // UTF-8 BOM hinzufügen für Excel-Kompatibilität
+        $bom = "\xEF\xBB\xBF";
+        file_put_contents($export_path->getPathname('csv', $additional), $bom . $csv);
     }
 
     protected function isQuestionTypeValid(string $type) : bool
