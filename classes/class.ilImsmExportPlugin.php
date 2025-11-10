@@ -3,6 +3,7 @@
 
 use ILIAS\Filesystem\Filesystem;
 use ILIAS\Filesystem\Util\LegacyPathHelper;
+use ILIAS\Test\ExportImport\ExportFilename;
 
 /**
  * @author Michael Jansen <mjansen@databay.de>
@@ -50,13 +51,12 @@ class ilImsmExportPlugin extends ilTestExportPlugin
     }
 
     /**
-     * @param ilTestExportFilename $export_path
      * @throws ilException
      */
-    protected function buildExportFile(ilTestExportFilename $export_path): void
+    protected function buildExportFile(ExportFilename $export_path): void
     {
         $config = $this->getConfig();
-        $data = $this->getTest()->getCompleteEvaluationData(true);
+        $data = $this->getTest()->getCompleteEvaluationData();
         $titles = $this->getTest()->getQuestionTitlesAndIndexes();
         $orderedIds = $this->getTest()->getQuestions();
         asort($orderedIds);
@@ -132,7 +132,7 @@ class ilImsmExportPlugin extends ilTestExportPlugin
                 }
             }
 
-            $lv = getdate($data->getParticipant($active_id)->getLastVisit());
+            $lv = getdate($data->getParticipant($active_id)->getLastVisit()?->getTimestamp());
             $tstamp = mktime($lv['hours'], $lv['minutes'], $lv['seconds'], $lv['mon'], $lv['mday'], $lv['year']);
             $lastvisit = date("d.m.Y G:i:s", $tstamp);
             $data_row[count($data_row)] = $lastvisit;
