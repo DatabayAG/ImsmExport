@@ -163,7 +163,11 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         if (!$filesystem->hasDir(dirname($relative_path))) {
             $filesystem->createDir(dirname($relative_path));
         }
-        $filesystem->write($relative_path, $writer->getCSVString());
+
+
+        // Add UTF-8 BOM for MS Excel compatibility
+        $bom = "\xEF\xBB\xBF";
+        $filesystem->write($relative_path, $bom . $writer->getCSVString());
     }
 
     protected function isQuestionTypeValid(string $type) : bool
