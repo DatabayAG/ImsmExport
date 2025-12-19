@@ -14,8 +14,7 @@ class ilImsmExportConfigGUI extends ilPluginConfigGUI
     private ilImsmExportConfig $config;
     private ilLanguage $lng;
     private ilCtrl $ctrl;
-    /** @var ilGlobalTemplateInterface $tpl */
-    private $tpl;
+    private ilGlobalTemplateInterface $tpl;
     private Factory $factory;
     private Renderer $renderer;
     private ServerRequestInterface $request;
