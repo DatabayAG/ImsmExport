@@ -28,8 +28,8 @@ By default, the export does not contain personal data. A configuration page in t
 3. run `composer du` in the ILIAS directory
 4. Login to ILIAS with an administrator account (e.g. root)
 5. Select **Plugins** from the **Administration** main menu drop down.
-6Search the **ImsmExport** plugin in the list of plugin and choose **Install** from the **Actions** drop down.
-7Search the **ImsmExport** plugin in the list of plugin and choose **Activate** from the **Actions** drop down.
+6. Search the **ImsmExport** plugin in the list of plugin and choose **Install** from the **Actions** drop down.
+7. Search the **ImsmExport** plugin in the list of plugin and choose **Activate** from the **Actions** drop down.
 
 ## File Example
 
