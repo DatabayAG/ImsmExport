@@ -60,17 +60,17 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $config = $this->getConfig();
         $data = $this->getTest()->getCompleteEvaluationData(true);
         $titles = $this->getTest()->getQuestionTitlesAndIndexes();
-        $orderedIds = $this->getTest()->getQuestions();
-        asort($orderedIds);
 
+        // $positions aus $titles aufbauen (definierte Testreihenfolge).
+        // asort() auf getQuestions() sortierte nach Question-ID statt Testsequenz.
         $positions = array();
         $pos = 0;
         $row = 0;
-        foreach ($orderedIds as $oid) {
-            $question = assQuestion::_instantiateQuestion($oid);
+        foreach ($titles as $aid => $title) {
+            $question = assQuestion::_instantiateQuestion($aid);
 
             if ($this->isQuestionTypeValid($question->getQuestionType())) {
-                $positions[$oid] = $pos;
+                $positions[$aid] = $pos;
                 $pos++;
             }
         }
