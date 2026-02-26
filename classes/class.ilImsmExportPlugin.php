@@ -2,7 +2,7 @@
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once(__DIR__ . '/class.ilImsmExportHelper.php');
-
+require_once(__DIR__ . '/class.ilImsmExportConfig.php');
 /**
  * Abstract parent class for all event hook plugin classes.
  * @author Michael Jansen <mjansen@databay.de>
@@ -60,17 +60,18 @@ class ilImsmExportPlugin extends ilTestExportPlugin
         $config = $this->getConfig();
         $data = $this->getTest()->getCompleteEvaluationData(true);
         $titles = $this->getTest()->getQuestionTitlesAndIndexes();
-        $orderedIds = $this->getTest()->getQuestions();
-        asort($orderedIds);
 
         $positions = array();
         $pos = 0;
         $row = 0;
-        foreach ($orderedIds as $oid) {
-            $question = assQuestion::_instantiateQuestion($oid);
+
+        // titles are indexed by question id, but sorted by test sequence
+        // columns are added in the order of the test sequence
+        foreach ($titles as $aid => $title) {
+            $question = assQuestion::_instantiateQuestion($aid);
 
             if ($this->isQuestionTypeValid($question->getQuestionType())) {
-                $positions[$oid] = $pos;
+                $positions[$aid] = $pos;
                 $pos++;
             }
         }
